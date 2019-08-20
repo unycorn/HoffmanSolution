@@ -1,9 +1,10 @@
-// ConsoleApplication6.cpp : Defines the entry point for the console application.
+// main.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
 #include <iostream>
 #include <stdio.h>
+#include <chrono>
 
 FILE * output = fopen("C:/Users/djhar/Desktop/myfile.txt", "w");
 
@@ -199,10 +200,16 @@ int main() {
 		}
 	}
 
+	// Run and measure time
+	auto t1 = std::chrono::high_resolution_clock::now();
 	iterateSolutions();
+	auto t2 = std::chrono::high_resolution_clock::now();
 
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+
+	// Final Output
 	if (doesFit(positions)) {
-		printf("Solution Found!\n\n");
+		printf("Solution found in %d ms!\n\n", duration/1000);
 
 		// Output solution to file and console
 		fprintf(output, "------------\nSOLUTION\n------------\n\n");
