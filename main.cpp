@@ -1,11 +1,7 @@
 // main.cpp : Defines the entry point for the console application.
 //
 
-#include <iostream>
 #include <stdio.h>
-#include <chrono>
-
-FILE * output = fopen("C:/Users/djhar/Desktop/myfile.txt", "w");
 
 // Six (6) means empty
 const int orient[7][3] = {
@@ -18,6 +14,7 @@ const int orient[7][3] = {
 	{ 0, 1, 2 }, //5
 	{ -1,-1,-1 }
 };
+
 
 int positions[3][3][3];
 
@@ -75,15 +72,15 @@ int mightFit(int(*arr)[3][3], int z, int y, int x) {
 }
 
 /* Tests if blocks can work ignoring rows with empty
-     spots and likely hanging blocks */
-int doesFit(int (*arr)[3][3]) {
+spots and likely hanging blocks */
+int doesFit(int(*arr)[3][3]) {
 	char first, second, third;
 	for (int x = 0; x < 3; x++) {
 		for (int y = 0; y < 3; y++) {
 			if (arr[x][y][0] != 6 && arr[x][y][1] != 6 && arr[x][y][2] != 6) {
-				first = orient[ arr[0][y][x] ][2];
-				second = orient[ arr[1][y][x] ][2];
-				third = orient[ arr[2][y][x] ][2];
+				first = orient[arr[0][y][x]][2];
+				second = orient[arr[1][y][x]][2];
+				third = orient[arr[2][y][x]][2];
 				if (first == second || second == third || third == first) {
 					return 0;
 				}
@@ -117,19 +114,6 @@ int doesFit(int (*arr)[3][3]) {
 	return 1;
 }
 
-void printArr(int(*arr)[3][3]) {
-	for (int a = 0; a < 3; a++) {
-		for (int b = 0; b < 3; b++) {
-			for (int c = 0; c < 3; c++) {
-				fprintf(output, "%d ", arr[a][b][c]);
-			}
-			fprintf(output, "\n");
-		}
-		fprintf(output, "\n");
-	}
-	fprintf(output, "------------\n\n");
-}
-
 void decrease(int &x, int &y, int &z) {
 	if (x == 0) {
 		x = 2;
@@ -137,7 +121,6 @@ void decrease(int &x, int &y, int &z) {
 			y = 2;
 			if (z == 0) {
 				z = 2;
-				printf("We're in too deep!");
 			}
 			else {
 				z--;
@@ -167,7 +150,7 @@ int iterateSolutions() {
 					}
 
 					positions[z][y][x] = i;
-					printArr(positions);
+
 					fits = mightFit(positions, z, y, x);
 					if (fits == 0) {
 						if (i == 5) {
@@ -188,6 +171,7 @@ int iterateSolutions() {
 			}
 		}
 	}
+	return 0;
 }
 
 int main() {
@@ -199,39 +183,27 @@ int main() {
 		}
 	}
 
-	// Run and measure time
-	auto t1 = std::chrono::high_resolution_clock::now();
 	iterateSolutions();
-	auto t2 = std::chrono::high_resolution_clock::now();
-
-	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
 	// Final Output
 	if (doesFit(positions)) {
-		printf("Solution found in %d ms!\n\n", duration/1000);
+		printf("Solution Found!\n\n");
 
 		// Output solution to file and console
-		fprintf(output, "------------\nSOLUTION\n------------\n\n");
 		for (int a = 0; a < 3; a++) {
 			for (int b = 0; b < 3; b++) {
 				for (int c = 0; c < 3; c++) {
-					fprintf(output, "%d ", positions[a][b][c]);
 					printf("%d ", positions[a][b][c]);
 				}
-				fprintf(output, "\n");
 				printf("\n");
 			}
-			fprintf(output, "\n");
 			printf("\n");
 		}
-		fprintf(output, "------------\n\n");
 		printf("\n");
 	}
 	else {
-		printf("Solution not found :(\n\n");
+		printf("Solution not found :(\n");
 	}
-	fclose(output);
-	system("pause");
-    return 0;
+	return 0;
 }
 
