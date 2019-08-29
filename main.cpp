@@ -3,10 +3,12 @@
 
 #include <stdio.h>
 
+FILE *output = fopen("./output.txt", "w");
+
 // Six (6) means empty
 const int orient[7][3] = {
 	// x,  y,  z
-	{ 2, 1, 0 }, //0
+  { 2, 1, 0 }, //0
 	{ 2, 0, 1 }, //1
 	{ 1, 2, 0 }, //2
 	{ 1, 0, 2 }, //3
@@ -15,10 +17,35 @@ const int orient[7][3] = {
 	{ -1,-1,-1 }
 };
 
-
+int foundpositions[10][3][3][3];
 int positions[3][3][3];
 
-int mightFit(int(*arr)[3][3], int z, int y, int x) {
+int mightFit(int(*arr)[3][3], int z, int y, int x, int solutionCount) {
+
+  // if this number equals solutionCount then a difference 
+  // has been found for each solution
+  int newness = 0;
+
+  for (int s = 0; s < solutionCount; s++) {
+		for (int a = 0; a < 3; a++) {
+			for (int b = 0; b < 3; b++) {
+        for (int c = 0; c < 3; c++) {
+          if (arr[z][y][x] != foundpositions[s][z][y][x]) {
+            newness++;
+            a = b = c = 3;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  //printf("%d \n", newness);
+
+  if (newness != solutionCount) {
+    return 0;
+  }
+
 	// Test if empty block is passed in (will never happen)
 	if (arr[z][y][x] == 6) {
 		return -1;
@@ -135,7 +162,7 @@ void decrease(int &x, int &y, int &z) {
 	}
 }
 
-int iterateSolutions() {
+int iterateSolutions(int(*arr)[3][3], int solutionCount) {
 	int counter = 0;
 	int fits;
 
@@ -149,20 +176,20 @@ int iterateSolutions() {
 						return 0;
 					}
 
-					positions[z][y][x] = i;
+					arr[z][y][x] = i;
 
-					fits = mightFit(positions, z, y, x);
+					fits = mightFit(arr, z, y, x, solutionCount);
 					if (fits == 0) {
 						if (i == 5) {
 							// Go back by 1 place
-							positions[z][y][x] = 6;
+							arr[z][y][x] = 6;
 							decrease(x, y, z);
-							while (positions[z][y][x] == 5) {
+							while (arr[z][y][x] == 5) {
 								decrease(x, y, z);
 							}
 						}
 
-						i = positions[z][y][x];
+						i = arr[z][y][x];
 					}
 					else {
 						break;
@@ -174,36 +201,43 @@ int iterateSolutions() {
 	return 0;
 }
 
-int main() {
-	for (int a = 0; a < 3; a++) {
+void initArray(int(*arr)[3][3]) {
+  for (int a = 0; a < 3; a++) {
 		for (int b = 0; b < 3; b++) {
 			for (int c = 0; c < 3; c++) {
-				positions[a][b][c] = 6;
+				arr[a][b][c] = 6;
 			}
 		}
 	}
-
-	iterateSolutions();
-
-	// Final Output
-	if (doesFit(positions)) {
-		printf("Solution Found!\n\n");
-
-		// Output solution to file and console
-		for (int a = 0; a < 3; a++) {
-			for (int b = 0; b < 3; b++) {
-				for (int c = 0; c < 3; c++) {
-					printf("%d ", positions[a][b][c]);
-				}
-				printf("\n");
-			}
-			printf("\n");
-		}
-		printf("\n");
-	}
-	else {
-		printf("Solution not found :(\n");
-	}
-	return 0;
 }
 
+int main() {
+  fprintf(output, "hello");
+
+  for(int i = 0; i < 10; i++) {
+    initArray(positions);
+  	iterateSolutions(positions, i);
+
+  	// Final Output
+	  if (doesFit(positions)) {
+	  	printf("Solution Found!\n\n");
+
+	  	// Output solution to file and console
+	  	for (int a = 0; a < 3; a++) {
+		  	for (int b = 0; b < 3; b++) {
+		  		for (int c = 0; c < 3; c++) {
+            foundpositions[i][a][b][c] = positions[a][b][c];
+		  			printf("%d ", positions[a][b][c]);
+		  		}
+			  	printf("\n");
+	  		}
+	  		printf("\n");
+	  	}
+	  	printf("\n");
+  	}
+  	else {
+  		printf("Solution not found :(\n");
+  	}
+  }
+	return 0;
+}
